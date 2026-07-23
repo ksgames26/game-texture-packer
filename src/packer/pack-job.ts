@@ -14,7 +14,7 @@ import {
   writePackedFiles,
 } from "./write-outputs.js";
 
-export type JobStatus = "succeeded" | "skipped";
+export type JobStatus = "succeeded" | "skipped" | "dry-run";
 
 export interface JobResult {
   name: string;
