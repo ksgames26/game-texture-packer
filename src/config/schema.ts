@@ -183,6 +183,7 @@ const jobSchema = z
 
 export const configSchema = z
   .object({
+    $schema: z.string().min(1).optional(),
     cwd: z.string().min(1).optional(),
     concurrency: z.number().int().positive().default(1),
     failFast: z.boolean().default(true),
@@ -205,5 +206,44 @@ export const configSchema = z
   });
 
 export function parseConfig(value: unknown): TexturePackerConfig {
-  return configSchema.parse(value) as TexturePackerConfig;
+  return configSchema.parse(mergeJobDefaults(value)) as TexturePackerConfig;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function mergeJobDefaults(value: unknown): unknown {
+  if (!isRecord(value) || !Array.isArray(value.jobs)) {
+    return value;
+  }
+
+  const defaults = isRecord(value.defaults) ? value.defaults : {};
+  const defaultInput = isRecord(defaults.input) ? defaults.input : {};
+  const defaultOutput = isRecord(defaults.output) ? defaults.output : {};
+  const defaultPacker = isRecord(defaults.packer) ? defaults.packer : {};
+
+  return {
+    ...value,
+    jobs: value.jobs.map((job) => {
+      if (!isRecord(job)) {
+        return job;
+      }
+      return {
+        ...job,
+        input: {
+          ...defaultInput,
+          ...(isRecord(job.input) ? job.input : {}),
+        },
+        output: {
+          ...defaultOutput,
+          ...(isRecord(job.output) ? job.output : {}),
+        },
+        packer: {
+          ...defaultPacker,
+          ...(isRecord(job.packer) ? job.packer : {}),
+        },
+      };
+    }),
+  };
 }

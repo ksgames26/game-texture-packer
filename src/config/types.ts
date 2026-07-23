@@ -103,6 +103,7 @@ export interface TexturePackerJob {
 }
 
 export interface TexturePackerConfig {
+  $schema?: string;
   cwd?: string;
   concurrency?: number;
   failFast?: boolean;
