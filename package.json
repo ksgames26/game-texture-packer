@@ -1,0 +1,64 @@
+{
+  "name": "game-texture-packer",
+  "version": "1.0.0",
+  "description": "Configuration-driven local texture atlas packer",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": "./schema/game-texture-packer.schema.json"
+  },
+  "bin": {
+    "game-texture-packer": "./dist/cli.js"
+  },
+  "files": [
+    "dist/**/*",
+    "schema/**/*",
+    "examples/**/*",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli.ts",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.12.3"
+  },
+  "packageManager": "pnpm@10.12.4",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "fast-glob": "^3.3.3",
+    "free-tex-packer-core": "^0.3.8",
+    "jsonc-parser": "^3.3.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.12",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.9"
+  },
+  "keywords": [
+    "texture",
+    "atlas",
+    "sprite",
+    "packer",
+    "cocos"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksgames26/game-texture-packer.git"
+  }
+}
