@@ -1,0 +1,458 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ksgames26/game-texture-packer/schema/game-texture-packer.schema.json",
+  "title": "Game Texture Packer Configuration",
+  "description": "Configuration for the game-texture-packer local atlas tool.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["jobs"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Editor-only path or URL to this JSON Schema."
+    },
+    "cwd": {
+      "type": "string",
+      "minLength": 1,
+      "default": ".",
+      "description": "Base directory for relative job paths; resolved from the config directory."
+    },
+    "concurrency": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Maximum number of jobs executed concurrently."
+    },
+    "failFast": {
+      "type": "boolean",
+      "default": true,
+      "description": "Stop scheduling new jobs after the first failure."
+    },
+    "defaults": {
+      "$ref": "#/$defs/jobDefaults"
+    },
+    "jobs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/job"
+      }
+    }
+  },
+  "$defs": {
+    "stringOrStrings": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "optionalStringOrStrings": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "inputOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files"],
+      "properties": {
+        "files": {
+          "$ref": "#/$defs/stringOrStrings",
+          "description": "One or more fast-glob input patterns."
+        },
+        "ignore": {
+          "$ref": "#/$defs/optionalStringOrStrings",
+          "default": [],
+          "description": "Glob patterns excluded from the input set."
+        },
+        "cwd": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Input search directory relative to the effective config cwd."
+        },
+        "allowEmpty": {
+          "type": "boolean",
+          "default": false
+        },
+        "followSymbolicLinks": {
+          "type": "boolean",
+          "default": false
+        },
+        "caseSensitiveMatch": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "inputDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "$ref": "#/$defs/stringOrStrings"
+        },
+        "ignore": {
+          "$ref": "#/$defs/optionalStringOrStrings"
+        },
+        "cwd": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowEmpty": {
+          "type": "boolean"
+        },
+        "followSymbolicLinks": {
+          "type": "boolean"
+        },
+        "caseSensitiveMatch": {
+          "type": "boolean"
+        }
+      }
+    },
+    "outputOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directory"],
+      "properties": {
+        "directory": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Output directory relative to the effective config cwd."
+        },
+        "overwrite": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow replacement of existing output files."
+        },
+        "manifest": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ],
+          "default": false,
+          "description": "Write a manifest using the default name or a custom path inside output.directory."
+        }
+      }
+    },
+    "outputDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "overwrite": {
+          "type": "boolean"
+        },
+        "manifest": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        }
+      }
+    },
+    "customExporter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileExt"],
+      "properties": {
+        "fileExt": {
+          "type": "string",
+          "pattern": "^\\.?[a-zA-Z0-9_-]+$"
+        },
+        "template": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Mustache template path relative to the effective config cwd."
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Inline Mustache template content."
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["template"],
+          "not": {
+            "required": ["content"]
+          }
+        },
+        {
+          "required": ["content"],
+          "not": {
+            "required": ["template"]
+          }
+        }
+      ]
+    },
+    "appInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "version"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "packerOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "textureName": {
+          "type": "string",
+          "minLength": 1,
+          "default": "pack-result",
+          "description": "Base name of generated texture and atlas files."
+        },
+        "suffix": {
+          "type": "string",
+          "default": "-",
+          "description": "Separator used before the index when multiple sheets are generated."
+        },
+        "suffixInitialValue": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2048,
+          "description": "Maximum atlas width."
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2048,
+          "description": "Maximum atlas height."
+        },
+        "fixedSize": {
+          "type": "boolean",
+          "default": false
+        },
+        "powerOfTwo": {
+          "type": "boolean",
+          "default": false
+        },
+        "padding": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "extrude": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "allowRotation": {
+          "type": "boolean",
+          "default": true
+        },
+        "detectIdentical": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowTrim": {
+          "type": "boolean",
+          "default": true
+        },
+        "trimMode": {
+          "type": "string",
+          "enum": ["trim", "crop"],
+          "default": "trim"
+        },
+        "alphaThreshold": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "default": 0
+        },
+        "removeFileExtension": {
+          "type": "boolean",
+          "default": false
+        },
+        "prependFolderName": {
+          "type": "boolean",
+          "default": true
+        },
+        "textureFormat": {
+          "type": "string",
+          "enum": ["png", "jpg", "webp"],
+          "default": "png"
+        },
+        "base64Export": {
+          "type": "boolean",
+          "default": false
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1
+        },
+        "scaleMethod": {
+          "type": "string",
+          "enum": ["BILINEAR", "NEAREST_NEIGHBOR", "BICUBIC", "HERMITE", "BEZIER"],
+          "default": "BILINEAR"
+        },
+        "tinify": {
+          "type": "boolean",
+          "default": false
+        },
+        "tinifyKey": {
+          "type": "string",
+          "default": "",
+          "description": "Inline TinyPNG API key; tinifyKeyEnv is safer."
+        },
+        "tinifyKeyEnv": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Environment variable that contains the TinyPNG API key."
+        },
+        "packer": {
+          "type": "string",
+          "enum": ["MaxRectsBin", "MaxRectsPacker", "OptimalPacker"],
+          "default": "MaxRectsBin"
+        },
+        "packerMethod": {
+          "type": "string",
+          "enum": [
+            "BestShortSideFit",
+            "BestLongSideFit",
+            "BestAreaFit",
+            "BottomLeftRule",
+            "ContactPointRule",
+            "Smart",
+            "Square",
+            "SmartSquare",
+            "SmartArea",
+            "SquareArea",
+            "SmartSquareArea",
+            "Automatic"
+          ],
+          "default": "BestShortSideFit"
+        },
+        "exporter": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "JsonHash",
+                "JsonArray",
+                "Css",
+                "OldCss",
+                "Pixi",
+                "GodotAtlas",
+                "GodotTileset",
+                "PhaserHash",
+                "PhaserArray",
+                "Phaser3",
+                "XML",
+                "Starling",
+                "Cocos2d",
+                "Spine",
+                "Unreal",
+                "UIKit",
+                "Unity3D",
+                "Egret2D"
+              ]
+            },
+            {
+              "$ref": "#/$defs/customExporter"
+            }
+          ],
+          "default": "JsonHash"
+        },
+        "filter": {
+          "type": "string",
+          "enum": ["grayscale", "mask", "none"],
+          "default": "none"
+        },
+        "appInfo": {
+          "$ref": "#/$defs/appInfo"
+        }
+      }
+    },
+    "jobDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/inputDefaults"
+        },
+        "output": {
+          "$ref": "#/$defs/outputDefaults"
+        },
+        "packer": {
+          "$ref": "#/$defs/packerOptions"
+        }
+      }
+    },
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "input", "output"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "input": {
+          "$ref": "#/$defs/inputOptions"
+        },
+        "output": {
+          "$ref": "#/$defs/outputOptions"
+        },
+        "packer": {
+          "$ref": "#/$defs/packerOptions"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+game-texture-packer
+Copyright (c) 2026 ksgames26
+
+This project wraps and depends on free-tex-packer-core:
+https://github.com/odrick/free-tex-packer-core
+
+free-tex-packer-core is Copyright (c) Oleksandr Norynchak and is distributed
+under the MIT License. Its source and license are available from the upstream
+repository and from the installed npm package.

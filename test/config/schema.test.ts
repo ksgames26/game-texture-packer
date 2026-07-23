@@ -4,6 +4,7 @@ import {
   EXPORTERS,
   MAX_RECTS_BIN_METHODS,
   MAX_RECTS_PACKER_METHODS,
+  OPTIMAL_PACKER_METHODS,
   PACKERS,
   SCALE_METHODS,
   TEXTURE_FORMATS,
@@ -62,7 +63,7 @@ describe("parseConfig", () => {
     expect(parseConfig(config).jobs[0]?.packer?.packer).toBe(packer);
   });
 
-  it.each([...MAX_RECTS_BIN_METHODS, ...MAX_RECTS_PACKER_METHODS])(
+  it.each([...MAX_RECTS_BIN_METHODS, ...MAX_RECTS_PACKER_METHODS, ...OPTIMAL_PACKER_METHODS])(
     "accepts packer method %s",
     (packerMethod) => {
       const config = minimalConfig();

@@ -26,6 +26,7 @@ export const MAX_RECTS_PACKER_METHODS = [
   "SquareArea",
   "SmartSquareArea",
 ] as const;
+export const OPTIMAL_PACKER_METHODS = ["Automatic"] as const;
 export const EXPORTERS = [
   "JsonHash",
   "JsonArray",
@@ -145,7 +146,11 @@ export const packerOptionsSchema = z
     tinifyKeyEnv: z.string().min(1).optional(),
     packer: z.enum(PACKERS).optional(),
     packerMethod: z
-      .enum([...MAX_RECTS_BIN_METHODS, ...MAX_RECTS_PACKER_METHODS] as [string, ...string[]])
+      .enum([
+        ...MAX_RECTS_BIN_METHODS,
+        ...MAX_RECTS_PACKER_METHODS,
+        ...OPTIMAL_PACKER_METHODS,
+      ] as [string, ...string[]])
       .optional(),
     exporter: z.union([z.enum(EXPORTERS), customExporterSchema]).optional(),
     filter: z.enum(BITMAP_FILTERS).optional(),

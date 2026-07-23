@@ -1,0 +1,63 @@
+{
+  "$schema": "../schema/game-texture-packer.schema.json",
+  "cwd": ".",
+  "concurrency": 2,
+  "failFast": true,
+  "defaults": {
+    "input": {
+      "ignore": ["**/*.tmp.png", "**/.DS_Store"],
+      "allowEmpty": false,
+      "followSymbolicLinks": false,
+      "caseSensitiveMatch": false
+    },
+    "output": {
+      "overwrite": false,
+      "manifest": true
+    },
+    "packer": {
+      "width": 2048,
+      "height": 2048,
+      "padding": 2,
+      "extrude": 1,
+      "allowRotation": false,
+      "allowTrim": true,
+      "trimMode": "trim",
+      "textureFormat": "png",
+      "packer": "OptimalPacker",
+      "packerMethod": "Automatic",
+      "exporter": "Cocos2d"
+    }
+  },
+  "jobs": [
+    {
+      "name": "hero-idle",
+      "input": {
+        "cwd": "../../arts/hero/idle",
+        "files": ["**/*.png"]
+      },
+      "output": {
+        "directory": "../../assets/bundles/battle-ui-res/atlases/hero"
+      },
+      "packer": {
+        "textureName": "hero-idle"
+      }
+    },
+    {
+      "name": "effects",
+      "enabled": true,
+      "input": {
+        "cwd": "../../arts/effects",
+        "files": ["**/*.png"],
+        "ignore": ["drafts/**"]
+      },
+      "output": {
+        "directory": "../../assets/bundles/battle-ui-res/atlases/effects"
+      },
+      "packer": {
+        "textureName": "effects",
+        "powerOfTwo": true,
+        "filter": "none"
+      }
+    }
+  ]
+}

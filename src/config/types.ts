@@ -63,7 +63,8 @@ export interface PackerOptions {
     | "SmartSquare"
     | "SmartArea"
     | "SquareArea"
-    | "SmartSquareArea";
+    | "SmartSquareArea"
+    | "Automatic";
   exporter?:
     | "JsonHash"
     | "JsonArray"
