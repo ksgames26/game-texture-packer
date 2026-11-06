@@ -66,6 +66,10 @@ game-texture-packer font cocos --config game-fonts.config.jsonc --output assets/
 字体源、规范化字符表、参数、生成实现指纹以及所有输出哈希。不会自动补字或隐式运行工具。
 系统异常中断可能留下部分新文件，此时检查失败，重新生成即可。
 
+提交生成物时，在消费项目的 `.gitattributes` 中将 FNT、默认材质、导出的 TS 和 Effect
+设置为 `text eol=lf`；原始 `*.sdf.json` 设置为 `-text`，保留生成器字节。
+否则 `core.autocrlf` 转换换行后会使清单校验失败。包内 Cocos 作者模板已固定 LF。
+
 ## Cocos Creator 3.8
 
 `font build` 不修改 `.meta`。显式执行 `font cocos` 才创建字体导入设置和共享材质，保留

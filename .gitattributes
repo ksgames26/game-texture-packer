@@ -1,0 +1,3 @@
+# 导出清单按字节校验模板，所有平台检出时保持相同换行。
+cocos/*.ts text eol=lf
+cocos/*.effect text eol=lf
