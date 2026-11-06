@@ -2,4 +2,7 @@
 
 import { runCli } from "./cli/program.js";
 
-process.exitCode = await runCli(process.argv);
+runCli(process.argv).then(code => { process.exitCode = code; }).catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

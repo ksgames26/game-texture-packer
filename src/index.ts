@@ -62,3 +62,8 @@ export {
   writeInitConfig,
   type WriteInitConfigOptions,
 } from "./templates/default-config.js";
+
+export { loadFontConfig, normalizeCharset, fontConfigSchema, type FontConfig, type FontJob } from "./fonts/config.js";
+export { buildFonts, type FontBuildResult } from "./fonts/build.js";
+export { setupFontTools } from "./fonts/tools.js";
+export { exportCocosFonts } from "./fonts/cocos.js";

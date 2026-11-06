@@ -1,0 +1,88 @@
+// 单通道 SDF；使用原生 UI 顶点格式与精灵纹理绑定，保持 Label 合批路径。
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: sdf-vs:vert
+      frag: sdf-fs:frag
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
+      blendState:
+        targets:
+        - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendSrcAlpha: one
+          blendDstAlpha: one_minus_src_alpha
+      rasterizerState:
+        cullMode: none
+      properties:
+        sdfParams: { value: [0.00048828125, 0.00048828125, 8, 0.0625] }
+        outlineColor: { value: [0, 0, 0, 1], editor: { type: color } }
+        outlineParams: { value: [0, 0, 0, 0] }
+}%
+
+CCProgram sdf-vs %{
+  precision highp float;
+  #include <builtin/uniforms/cc-global>
+  #if USE_LOCAL
+    #include <builtin/uniforms/cc-local>
+  #endif
+  in vec3 a_position;
+  in vec2 a_texCoord;
+  in vec4 a_color;
+  out vec2 uv0;
+  out vec4 color;
+  vec4 vert () {
+    vec4 pos = vec4(a_position, 1.0);
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+    uv0 = a_texCoord;
+    color = a_color;
+    return cc_matViewProj * pos;
+  }
+}%
+
+CCProgram sdf-fs %{
+  #if __VERSION__ < 300
+    #if USE_DERIVATIVES
+      #extension GL_OES_standard_derivatives : enable
+    #endif
+  #endif
+  precision highp float;
+  in vec2 uv0;
+  in vec4 color;
+  #pragma builtin(local)
+  layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+  uniform SdfParams {
+    vec4 sdfParams;
+    vec4 outlineColor;
+    vec4 outlineParams;
+  };
+  vec4 frag () {
+    // 距离场为线性数据，不能套用颜色纹理的 sRGB 解码。
+    float distanceValue = texture(cc_spriteTexture, uv0).r;
+    float screenRange;
+    #if USE_DERIVATIVES
+      vec2 screenSize = 1.0 / max(fwidth(uv0), vec2(0.000001));
+      screenRange = max(0.5 * dot(sdfParams.xy * sdfParams.z, screenSize), 1.0);
+    #else
+      // 不支持导数的设备使用固定字号材质，w 为该字号下的半像素平滑宽度。
+      screenRange = 0.5 / max(sdfParams.w, 0.000001);
+    #endif
+    float pixelDistance = (distanceValue - 0.5) * screenRange;
+    float fillAlpha = clamp(pixelDistance + 0.5, 0.0, 1.0);
+    #if USE_OUTLINE
+      // x 为图集像素单位描边宽度，限制在距离场外侧可表达范围以内。
+      float width = clamp(outlineParams.x, 0.0, max(sdfParams.z * 0.5 - 1.0, 0.0));
+      float outerAlpha = clamp(pixelDistance + width * screenRange / sdfParams.z + 0.5, 0.0, 1.0);
+      float edgeAlpha = (outerAlpha - fillAlpha) * outlineColor.a;
+      float alpha = fillAlpha + edgeAlpha;
+      vec3 rgb = (color.rgb * fillAlpha + outlineColor.rgb * edgeAlpha) / max(alpha, 0.000001);
+      return vec4(rgb, alpha * color.a);
+    #else
+      return vec4(color.rgb, fillAlpha * color.a);
+    #endif
+  }
+}%

@@ -20,6 +20,8 @@
     "dist/**/*",
     "schema/**/*",
     "examples/**/*",
+    "cocos/**/*",
+    "docs/FONTS.md",
     "README.md",
     "LICENSE",
     "NOTICE"
@@ -39,6 +41,7 @@
   "dependencies": {
     "commander": "^14.0.0",
     "fast-glob": "^3.3.3",
+    "fflate": "0.8.2",
     "free-tex-packer-core": "^0.3.8",
     "jsonc-parser": "^3.3.1",
     "zod": "^3.25.76"

@@ -7,6 +7,7 @@ import {
   type NormalizeConfigOptions,
 } from "../config/normalize-config.js";
 import { runConfig, type RunSummary } from "../runner/run-config.js";
+import { registerFontCommands } from "../fonts/cli.js";
 import {
   DEFAULT_CONFIG_FILENAME,
   writeInitConfig,
@@ -56,6 +57,7 @@ export function createProgram(
     .name("game-texture-packer")
     .description("Configuration-driven local texture atlas packer")
     .version("1.0.0")
+    .enablePositionalOptions()
     .showHelpAfterError()
     .configureOutput({
       writeOut: services.stdout,
@@ -81,11 +83,12 @@ export function createProgram(
     .action(async (target: string, options: InitCliOptions) => {
       const written = await services.writeInitConfig(target, {
         cwd: path.resolve(services.cwd()),
-        force: options.force ?? false,
+        force: Boolean(options.force),
       });
       services.stdout(`Created texture packer config: ${written}\n`);
     });
 
+  registerFontCommands(program, services.stdout);
   return program;
 }
 
@@ -125,7 +128,7 @@ function configurePackCommand(command: Command): Command {
 }
 
 async function executePack(options: PackCliOptions, services: CliServices): Promise<number> {
-  const commandCwd = path.resolve(services.cwd(), options.cwd ?? ".");
+  const commandCwd = path.resolve(services.cwd(), options.cwd === undefined ? "." : options.cwd);
   const loaded = await services.loadConfig(options.config, { cwd: commandCwd });
   const overridden = services.applyJobOverrides(loaded.config, options.set, options.job);
   const normalizeOptions: NormalizeConfigOptions = {};
@@ -144,10 +147,10 @@ async function executePack(options: PackCliOptions, services: CliServices): Prom
   }
 
   const summary = await services.runConfig(normalized, {
-    dryRun: options.dryRun ?? false,
+    dryRun: Boolean(options.dryRun),
     selectedJobs: options.job,
   });
-  printSummary(summary, services, options.verbose ?? false);
+  printSummary(summary, services, Boolean(options.verbose));
   return summary.failed > 0 ? 1 : 0;
 }
 

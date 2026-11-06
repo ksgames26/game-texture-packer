@@ -11,7 +11,11 @@
 - JSON Schema、完整初始化模板和 TypeScript API
 - 输出越界保护及默认禁止覆盖
 
-工具不会创建或修改 Cocos Creator 的 `.meta` 文件。
+图集 `pack` 不会创建或修改 Cocos Creator 的 `.meta` 文件。
+
+另外提供 `font setup/build/cocos` 字体工具链：fontbm 普通位图、单通道 SDF、字符表与输出校验，
+以及 Cocos Creator 3.8 的共享材质和 Label 适配。只有显式 `font cocos` 会创建字体相关导入设置。
+使用方式与作者源位置见 [字体说明](docs/FONTS.md)。
 
 ## 环境
 
